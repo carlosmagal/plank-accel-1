@@ -33,7 +33,7 @@ export function Chat() {
               if (data.content) {
                 result += data.content;
                 // Update messages with the accumulated response
-                setMessages(prev => {
+                setMessages((prev) => {
                   const newMessages = [...prev];
                   const lastMessage = newMessages[newMessages.length - 1];
                   if (lastMessage && lastMessage.role === 'assistant') {
@@ -42,7 +42,7 @@ export function Chat() {
                     newMessages.push({
                       id: Date.now().toString(),
                       role: 'assistant',
-                      content: result
+                      content: result,
                     });
                   }
                   return newMessages;
@@ -76,20 +76,16 @@ export function Chat() {
   };
 
   return (
-    <div className="flex flex-col h-screen max-w-2xl">
-      <div className="flex-1 overflow-y-auto space-y-4 mb-4">
+    <div className="flex h-screen max-w-2xl flex-col">
+      <div className="mb-4 flex-1 space-y-4 overflow-y-auto">
         {messages.map((message) => (
           <div
             key={message.id}
-            className={`flex ${
-              message.role === 'user' ? 'justify-end' : 'justify-start'
-            }`}
+            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`px-4 py-2.5 max-w-[85%] rounded-xl ${
-                message.role === 'user'
-                  ? 'bg-blue-400 text-white'
-                  : 'bg-gray-100 text-gray-800'
+              className={`max-w-[85%] rounded-xl px-4 py-2.5 ${
+                message.role === 'user' ? 'bg-blue-400 text-white' : 'bg-gray-100 text-gray-800'
               }`}
             >
               {message.content}
@@ -98,11 +94,11 @@ export function Chat() {
         ))}
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-gray-100 text-gray-800 rounded-xl px-4 py-2.5">
+            <div className="rounded-xl bg-gray-100 px-4 py-2.5 text-gray-800">
               <div className="flex space-x-2">
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" />
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-100" />
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce delay-200" />
+                <div className="h-2 w-2 animate-bounce rounded-full bg-gray-500" />
+                <div className="h-2 w-2 animate-bounce rounded-full bg-gray-500 delay-100" />
+                <div className="h-2 w-2 animate-bounce rounded-full bg-gray-500 delay-200" />
               </div>
             </div>
           </div>
@@ -116,12 +112,12 @@ export function Chat() {
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           placeholder="Type your message..."
-          className="flex-1 rounded-xl border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none min-h-[44px] max-h-[200px] overflow-y-auto"
+          className="max-h-[200px] min-h-[44px] flex-1 resize-none overflow-y-auto rounded-xl border border-gray-300 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
           disabled={isLoading}
         />
         <button
           type="submit"
-          className="bg-blue-500 text-white px-6 py-3 rounded-xl hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed self-end"
+          className="self-end rounded-xl bg-blue-500 px-6 py-3 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
           disabled={isLoading || !input.trim()}
         >
           {isLoading ? 'Sending...' : 'Send'}

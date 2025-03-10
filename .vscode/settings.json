@@ -21,5 +21,5 @@
   "keyboard.dispatch": "keyCode",
   "[typescriptreact]": {
     "editor.defaultFormatter": "vscode.typescript-language-features"
-  },
+  }
 }

@@ -41,26 +41,17 @@ export class ChatAgent {
     ]);
 
     // Create the chain
-    this.chain = RunnableSequence.from([
-      prompt,
-      this.model,
-      new StringOutputParser(),
-    ]);
+    this.chain = RunnableSequence.from([prompt, this.model, new StringOutputParser()]);
   }
 
   async sendMessage(input: string, state: ChatState): Promise<ChatState> {
     // Add user message to history
     const newState = {
-      messages: [
-        ...state.messages,
-        { role: 'user' as const, content: input },
-      ],
+      messages: [...state.messages, { role: 'user' as const, content: input }],
     };
 
     // Get the conversation history as context
-    const history = newState.messages
-      .map((msg) => `${msg.role}: ${msg.content}`)
-      .join('\n');
+    const history = newState.messages.map((msg) => `${msg.role}: ${msg.content}`).join('\n');
 
     // Create a new run in LangSmith
     let runId: string | undefined;

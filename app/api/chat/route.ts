@@ -21,11 +21,17 @@ export async function POST(req: Request) {
         const response = newState.messages[newState.messages.length - 1].content;
 
         // Send the response as a data event
-        controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ content: response })}\n\n`));
+        controller.enqueue(
+          new TextEncoder().encode(`data: ${JSON.stringify({ content: response })}\n\n`)
+        );
         controller.close();
       } catch (error) {
         // Send error as a data event
-        controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' })}\n\n`));
+        controller.enqueue(
+          new TextEncoder().encode(
+            `data: ${JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' })}\n\n`
+          )
+        );
         controller.close();
       }
     },
@@ -35,7 +41,7 @@ export async function POST(req: Request) {
     headers: {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive',
+      Connection: 'keep-alive',
     },
   });
 }
