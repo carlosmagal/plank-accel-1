@@ -1,43 +1,42 @@
 'use client';
 
-import { createBrowserClient } from '@supabase/ssr';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function SignUp() {
+export default function SignupPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
+  const message = searchParams.get('message');
 
-  const handleSignUp = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    setSuccess(false);
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${location.origin}/auth/callback`,
-      },
-    });
+    try {
+      const response = await fetch('/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (error) {
-      setError(error.message);
-    } else {
-      setSuccess(true);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to sign up');
+      }
+
+      router.replace('/chat');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -48,14 +47,9 @@ export default function SignUp() {
             Create your account
           </h2>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSignUp}>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && <div className="text-center text-sm text-red-500">{error}</div>}
-          {success && (
-            <div className="text-center text-sm text-green-500">
-              Check your email to confirm your account. You can close this window and return to the
-              login page.
-            </div>
-          )}
+          {message && <div className="text-center text-sm text-green-500">{message}</div>}
           <div className="-space-y-px rounded-md shadow-sm">
             <div>
               <label htmlFor="email" className="sr-only">
@@ -92,10 +86,10 @@ export default function SignUp() {
           <div>
             <button
               type="submit"
-              disabled={loading || success}
+              disabled={loading}
               className="group relative flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {loading ? 'Creating account...' : success ? 'Account created!' : 'Sign up'}
+              {loading ? 'Creating account...' : 'Create account'}
             </button>
           </div>
         </form>

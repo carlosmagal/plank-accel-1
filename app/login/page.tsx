@@ -1,10 +1,9 @@
 'use client';
 
-import { createBrowserClient } from '@supabase/ssr';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function Login() {
+export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
@@ -14,28 +13,30 @@ export default function Login() {
 
   const message = searchParams.get('message');
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const response = await fetch('/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (error) {
-      setError(error.message);
-    } else {
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to login');
+      }
+
       router.replace('/chat');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -46,7 +47,7 @@ export default function Login() {
             Sign in to your account
           </h2>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && <div className="text-center text-sm text-red-500">{error}</div>}
           {message && <div className="text-center text-sm text-green-500">{message}</div>}
           <div className="-space-y-px rounded-md shadow-sm">
@@ -98,7 +99,7 @@ export default function Login() {
             onClick={() => router.push('/signup')}
             className="text-sm text-blue-600 hover:text-blue-500"
           >
-            Don't have an account? Sign up
+            Don&apos;t have an account? Sign up
           </button>
         </div>
       </div>
