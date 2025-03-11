@@ -1,14 +1,15 @@
-'use client';
-
 import { Chat } from '@/components/Chat';
+import Header from '@/components/Header';
 
 export default function ChatPage() {
   return (
-    <main className="h-screen bg-white">
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold">Chat</h1>
-        <Chat />
-      </div>
-    </main>
+    <div className="flex min-h-screen flex-col bg-gray-50">
+      <Header />
+      <main className="flex-1">
+        <div className="mx-auto max-w-7xl">
+          <Chat />
+        </div>
+      </main>
+    </div>
   );
 }
